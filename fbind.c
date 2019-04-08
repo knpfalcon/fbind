@@ -2,7 +2,7 @@
 *              File Binder v1.0
 *              By Joshua Taylor
 *
-git*    Basically this takes a bunch of files and puts
+*    Basically this takes a bunch of files and puts
 *    them in one file, then it spits out a header
 *    file with defines to an index number.
 *
