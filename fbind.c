@@ -2,7 +2,7 @@
 *              File Binder v1.0
 *              By Joshua Taylor
 *
-*    Basically this take a bunch of files and puts
+*    Basically this takes a bunch of files and puts
 *    them in one file, then it spits out a header
 *    file with defines to an index number.
 *
@@ -21,6 +21,8 @@
 #define byte unsigned char
 #define MAX_FILE_NAME 16
 
+const char FILE_OUT_DEFAULT[] = "OUT.DAT";
+const char HEADER_OUT_DEFAULT[] = "OUT.H";
 
 void print_title()
 {
@@ -38,32 +40,52 @@ int get_file_size(FILE *fptr)
 // Go back and add error checking 
 int pack_to_file(int argc, char *argv[])
 {
-    char fileout_name[MAX_FILE_NAME] = "DEFAULT.DAT";
-    char header_name[MAX_FILE_NAME] = "DEFAULT.H";
+    char fileout_name[MAX_FILE_NAME] = "\0";
+    char header_name[MAX_FILE_NAME] = "\0";
     FILE *fp;
     FILE *fpout;
     FILE *header;
     char i_mark[] = "idx";
-
-    byte ch; //for byte transfer
     
-    //Loop through all the files and put them in a file
-    printf("\n\nEnter resulting filename (ex. mydata.dat): ");
-    if ((gets(fileout_name)) == NULL)
+    //Ask user what to name the files.
+    char *p;
+
+    printf("\n\nEnter resulting filename (DEFAULT IS \"OUT.DAT\"): ");    
+    if (fgets(fileout_name, MAX_FILE_NAME, stdin))
     {
-        printf("fgets failure on fileout_name!");
-        return 1;
+        p = strchr(fileout_name, '\n');         //Check for newline character
+        if (p)
+        {
+            *p = '\0';                           //Replace the newline character with NULL terminate character
+        }
+        if (strcmp(fileout_name, "") == 0)       //Check to see if it's blank
+        {
+            strcpy(fileout_name, FILE_OUT_DEFAULT);
+        }
+        
     }
-    printf("Enter header filename (ex. mydata.h): ");
-    if ((gets(header_name) == NULL))
+
+    printf("Enter header filename (DEFAULT IS \"OUT.H\"): ");
+    if (fgets(header_name, MAX_FILE_NAME, stdin))
     {
-        printf("fgets failure on header_name!");
-        return 1;
+        p = strchr(header_name, '\n');         //Check for newline character
+        if (p)
+        {
+            *p = '\0';                         //Replace the newline character with NULL terminate character
+        }
+        if (strcmp(header_name, "") == 0)      //Check to see if it's blank
+        {
+            strcpy(header_name, HEADER_OUT_DEFAULT);
+        }
+
+        
     }
 
     printf("\nDatafile: %s\nHeader file: %s\n", fileout_name, header_name);
 
-    if ((fpout = fopen(fileout_name, "wb")) == NULL)
+    //Create the OUT files
+    fpout = fopen(fileout_name, "wb");
+    if (fpout == NULL)
     {
         printf("Errno: %d, %s\n", errno, strerror(errno));
         printf("Error with creating file out!\n");
@@ -85,21 +107,20 @@ int pack_to_file(int argc, char *argv[])
 
         fp = fopen(argv[i], "rb");
         rewind(fp);
-        fwrite(i_mark, 1, sizeof(i_mark), fpout); //Write index marker
-        fprintf(fpout, "%d", i-1);                //Write index number (Might change this to fwrite)
-        fprintf(header, "#define %s        %d\n", basename((argv[i])), i-1); //add the basename to the header and assigne the index
+        fwrite(i_mark, 1, sizeof(i_mark), fpout);                           //Write index marker
+        fprintf(fpout, "%d", i-1);                                          //Write index number (Might change this to fwrite)
+        fprintf(header, "#define %-16s %8d\n", basename((argv[i])), i-1);    //add the basename to the header and assign the index
 
-        //Find out the filesize in bytes
-        fseek(fp, 0, SEEK_END);
-        file_size = ftell(fp);
-        rewind(fp);
+        
+        file_size = get_file_size(fp);              //Find out the filesize in bytes
+        rewind(fp);                                 //Rewind the pointer to the beginning of the file
 
-        buff = malloc(file_size * sizeof(byte)); //Create a buffer to dump file contents into
+        buff = malloc(file_size * sizeof(byte));    //Create a buffer to dump file contents into
         fread(buff, 1, file_size, fp);
 
         for (int b = 0; b < file_size; b++)
         {
-            fwrite(buff+b, sizeof(byte), 1, fpout); //Write it to the dat one byte at a time
+            fwrite(buff+b, sizeof(byte), 1, fpout);    //Write it to the dat one byte at a time
         }
    
         printf("\n%s packed to %s", argv[i], fileout_name);
