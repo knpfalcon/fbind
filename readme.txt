@@ -17,7 +17,7 @@ Well, you can do it the hard way on command line:
 Put the above in a batch file if you care about order. Add in files as
 needed. Run it. 
 
-You can also just drag and drop several files onto the excutable in 
+You can also just drag and drop several files onto the executable in 
 Windows explorer. 
 
 
@@ -26,4 +26,4 @@ Why did I make this?
 I was bored, and for some reason I'm facinated with file formats. I love
 looking at files in a hex editor.
 
-But I also kind of needed it for another project of mine.
+But I also kind of need it for another project of mine.
