@@ -40,8 +40,8 @@ int get_file_size(FILE *fptr)
 // Go back and add error checking 
 int pack_to_file(int argc, char *argv[])
 {
-    char fileout_name[MAX_FILE_NAME] = "\0";
-    char header_name[MAX_FILE_NAME] = "\0";
+    char fileout_name[MAX_FILE_NAME];
+    char header_name[MAX_FILE_NAME];
     FILE *fp;
     FILE *fpout;
     FILE *header;
